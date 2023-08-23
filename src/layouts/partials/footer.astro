@@ -1,0 +1,19 @@
+---
+import {Content, frontmatter as info} from 'src/siteInfo.md'
+import ThemeChanger from '@components/themeChanger.astro'
+// import Logo from '@components/logo.astro'
+const { dark, hideLogo, divider } = Astro.props
+---
+<footer class="text-center pb-12 pt-16" data-theme={dark ? "dark" : null}>
+    {divider && <div class="divider mb-12 px-4"></div>}
+    <div class="flex justify-center mb-4">
+        {(!hideLogo && !info.hideFooterLogo)&& <Content/>}
+    </div>
+    <!-- <Social/> -->
+    <p class="text-gray-600 mb-4">
+        {info.companyName}® - Todos os direitos reservados. <br class="md:hidden">
+        {info.corp?.cnpj && `CNPJ ${info.corp.cnpj}`} {info.corp?.razao}
+    </p>
+    <p class="text-gray-600 opacity-80"><a href="https://acopa.com.br">Com tecnologia COPA®⚡</a></p>
+    {info.themeChanger && <ThemeChanger/>}
+</footer>

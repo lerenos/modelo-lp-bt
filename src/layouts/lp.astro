@@ -1,0 +1,149 @@
+---
+import Layout from "@layouts/partials/layoutBase.astro"
+import Footer from "@layouts/partials/footer.astro"
+
+import { Markdown } from '@astropub/md'
+
+import Banner from "@components/banner/countdown.astro"
+
+import Depoimento from "@components/cards/depoimento.astro"
+import Card from "@components/cards/main.astro"
+import CardN from "@components/cards/numberH3.astro"
+import Offer from "@components/cards/offer.astro"
+
+import garantia from "@assets/garantia.webp"
+import garantia15 from "@assets/garantia15dias.webp"
+
+import Cta from "@components/cta.astro"
+
+import {frontmatter as siteInfo} from 'src/siteInfo.md'
+
+let f = Astro.props.frontmatter
+f.tema = f.tema || (siteInfo.tema || "bumblebee")
+
+let discount = Math.round((1-(f.offers.list[0].price/f.offers.list[0].priceFrom))*100)
+
+f.afterHeadline.priceCallout = f.afterHeadline.priceCallout || `${discount}% OFF | De R$ ${f.offers.list[0].priceFrom} por <strong>Apenas R$ ${f.offers.list[0].price}</strong>`
+
+let roundedBorders=false
+
+---
+<Layout props={f}>
+
+    <main class="text-xl [&_section]:px-4">
+
+        {f.countdown.show &&
+            <Banner title={f.countdown.title} text={f.countdown.text} time={f.countdown.time}/>
+        }
+
+        <!-- Promessa, Título e Subpromessa -->
+        <section id="headline" class="empty:hidden py-10 md:py-18 text-center [&>*]:md:mx-auto">
+            <h1 class="md:max-w-screen-lg md:mx-auto text-2xl md:text-4xl font-black dark:text-white tracking-wide my-8 md:mb-12 empty:hidden" set:html={f.headline} />
+            {f.subheadline && <p class="text-base-content font-semibold md:max-w-screen-md mb-4 md:mb-12 empty:hidden" set:html={f.subheadline}/>}
+        </section>
+
+        <!-- Ancoragem de Preço -->
+        <section id="price" class="py-4 md:py-12 text-center leading-relaxed [&>p]:mb-4 bg-black shadow-md">
+            <h2 class="text-primary font-black mb-4 md:mb-12 md:max-w-screen-lg md:mx-auto md:text-3xl" set:html={f.afterHeadline.title}/>
+            <p class="text-white md:text-3xl" set:html={f.afterHeadline.priceCallout}/>
+        </section>
+
+        <!-- Provas -->
+        {f.testimonials?.show &&
+            <section id="proof" class="py-20 lg:pb-32 dark:[&_h2]:text-primary">
+                <h2 class="text-center text-3xl md:text-5xl font-black mb-12 md:mb-16" set:html={f.testimonials.title}/>
+                <div class="flex gap-12 flex-wrap justify-center">
+                    {f.testimonials?.list && f.testimonials.list.map( p => 
+                        <Depoimento {roundedBorders} img={p.img} nome={p.author.name} subtitle={p.author.title} set:html={p.quote}/> 
+                        )
+                    }
+                </div>
+                <div class="flex gap-12 py-4 md:py-8 flex-wrap justify-center [&_img]:shadow-lg hover:[&_img]:scale-105 [&_img]:duration-500 [&_img]:my-8 [&_img]:md:max-w-4xl [&_img]:md:rounded-[--rounded-box]">
+                    {f.testimonials?.imgList && f.testimonials.imgList.map( (p,i) => 
+                        <img src={p} alt={`Prova #${i+1}`} /> 
+                        )
+                    }
+                </div>
+        </section>}
+
+        <!-- O que você vai apreneder? -->
+        <section id="what" class="text-center py-12 leading-relaxed [&>p]:mb-6 md:max-w-screen-md md:mx-auto [&_img]:rounded-sm [&_img]:shadow-lg hover:[&_img]:scale-105 [&_img]:duration-500 [&_img]:my-8 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:list-inside [&_li::marker]:font-bold dark:[&_h2]:text-primary [&_h2]:text-3xl [&_h2]:md:text-5xl [&_h2]:font-black [&_h2]:mt-12 [&_h2]:mb-4">
+            <h2 set:html={f.what.title}/>
+            <Markdown of={f.what.body}/>
+        </section>
+        
+        <!-- Learning Outcomes -->
+        {f.outcomes.list &&
+            <section id="outcomes" class="py-20 lg:pb-32 bg-black text-center" >
+                <h2 class="text-primary text-3xl md:text-5xl font-black mb-12" set:html={f.outcomes.title}/>
+                <div class="flex flex-wrap justify-center divide-y divide-base-content bg-black text-white">
+                    {f.outcomes.list.map( (b,i) => 
+                        <Card noShadow transparent wfull icon>
+                            <Fragment slot="h3">{b}</Fragment>
+                        </Card> 
+                        )
+                    }
+                </div>
+            </section>}
+            
+        
+        <!-- Para quem? -->
+        {f.who.list &&
+        <section id="who" class="py-20 dark:[&_h2]:text-primary">
+            <h2 class="text-center text-3xl md:text-5xl font-black mb-12" set:html={f.who.title}/>
+            <div class="flex gap-12 flex-wrap justify-center text-center">
+                {f.who.list.map( (b,i) => 
+                    <Card {roundedBorders} icon="person">
+                        <Fragment slot="h3">{b}</Fragment>
+                    </Card> 
+                    )
+                }
+            </div>
+        </section>}
+
+        <!-- Lista de benefícios -->
+        {f.benefits.list &&
+        <section id="benefits" class="py-20 pb-32 md:pb-48 dark:[&_h2]:text-primary">
+            <h2 class="text-center text-3xl md:text-5xl font-black mb-12" set:html={f.benefits.title}/>
+            <div class="flex gap-12 flex-wrap justify-center">
+                {f.benefits.list.map( (b,i) => 
+                    <CardN {roundedBorders}>
+                        <Fragment slot="number"> {i+1} </Fragment>
+                        <>{b.title}</>
+                        <Fragment slot="text"> {b.text} </Fragment>
+                    </CardN> 
+                    )
+                }
+            </div>
+        </section>}
+                
+        
+        <!-- Garantia -->
+        <!-- <section id="garantia" class="py-16 md:flex md:gap-12 md:items-center md:max-w-screen-lg md:mx-auto">
+                {(garantiaDias==15) ? 
+                    <img src={garantia15} alt="Garantia de 15 dias" class="md:mb-0 mb-8 mx-auto" width="240" height="240"/>:
+                    <img src={garantia} alt={`Garantia de ${garantiaDias} dias`} class="md:mb-0 mb-8 mx-auto" width="240" height="240"/>
+                }
+                <div>
+                <h2 class="md:mb-8 md:text-4xl text-3xl font-bold tracking-wide mb-12 text-black" set:html={garantiaTitle}/>
+                <slot name="garantiaTexto"/>
+            </div>
+        </section> -->
+
+        <!-- Oferta -->
+        <section id="oferta" class="py-12 lg:pb-32 bg-primary">
+        
+            <h2 class="text-4xl md:text-5xl text-primary-content font-bold tracking-wide mb-20 text-center" set:html={f.offers.title}/>
+
+            <div class="flex gap-4 flex-wrap justify-center text-center items-start">
+                {f.offers.list.map( offer => 
+                    <Offer dark content={offer} hidePriceFrom />
+                    )
+                }
+            </div>
+
+        </section>
+
+    </main>
+    <Footer dark/>
+</Layout>

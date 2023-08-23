@@ -1,0 +1,318 @@
+# local_backend: true
+backend:
+  name: git-gateway
+  # name: proxy
+  # proxy_url: http://localhost:8081/api/v1
+  branch: main
+locale: pt
+# publish_mode: editorial_workflow
+media_folder: 'public/cms'
+public_folder: '/cms/'
+collections:
+  - name: 'lp'
+    label: 'LPs'
+    label_singular: 'LP'
+    folder: 'src/pages/lp'
+    create: true
+    delete: true
+    preview: false
+    summary: '{{title}} - (slug: {{fields.slug}})'
+    slug: '{{fields.slug}}'
+    fields:
+      - name: 'headline'
+        label: 'Headline (Promessa)'
+        widget: 'text'
+        required: false
+        hint: "Para produtos de baixo ticket, a promessa deve ser clara, direta e objetiva. Você consegue formatar envolvendo com as tags *<em>* e <u>. Quebra de linha com <br>"
+        default: "Aprenda como ganhar <br> <strong>de X a Y reais por dia</strong> <br> vendendo P <em>no automático</em>"
+      - name: 'subheadline'
+        label: 'Sub headline (Reforço da Promessa)'
+        widget: 'text'
+        minimal: true
+        hint: "Ideal ficar em torno de 21 palavras. Você consegue formatar envolvendo com as tags **<strong>**, *<em>* e <u>. Quebra de linha com <br>"
+        default: A forma mais simples de ter resultados <em>verdadeiramente expressivos</em> vendendo P no automático.
+      - { name: 'slug', label: 'Slug da Página', widget: 'string', hint: 'Pedaço final da url na barra de endereços. Ex.: "metodo-x". Este campo não pode ser modificado após a criação da página. Se quiser modificar, duplique a página e exclua a antiga.' }
+      - { name: 'title', label: 'Título da Página', widget: 'string', default: "Título da Página | Sua Marca", hint: "Título que aparece na aba do navegador ou em compartilhamento da página" }
+      - { name: 'description', label: 'Metadescrição', widget: 'string', required: false, hint: "Descrição da página. Texto que aparece em compartilhamentos, e pode auxiliar em mecanismos de busca. Ideal ficar abaixo de 160 caracteres." }
+      - name: 'offers'
+        label: 'Seção de Ofertas'
+        widget: object
+        hint: Esta é a última seção da página, mas já coloquei logo aqui no início para facilitar a organização da estrutura.
+        fields:
+          - {name: 'title', label: 'Título da Seção de Ofertas', widget: 'string', required: false, default: "Escolha a melhor oferta para você:"} 
+          - name: list
+            label: Ofertas
+            label_singular: Oferta
+            widget: 'list'
+            summary: 'R$ {{fields.price}} - {{fields.title}}'
+            fields:
+              # - { name: 'id', widget: 'string', label: 'Id da Oferta', hint: "uso interno, não aparece na página"}
+              - { name: 'price', widget: 'number', label: 'Preço', value_type: "int", default: 10}
+              - { name: 'priceFrom', widget: 'number', label: 'Preço "De"', value_type: "float", default: 97, required: false, hint: 'Opcional'}
+              - { name: 'title', widget: 'string', label: 'Título da oferta', default: "Acesso Comum"}
+              - { name: 'link', widget: 'string', label: 'Link do Botão', required: false, default: "https://acopa.com.br/lp/?utm_source=modelo-funil", hint: 'https://...' }
+              - { name: 'cta', widget: 'string', label: 'Texto do Botão', default: "Clique aqui para liberar o seu acesso" }
+              - name: 'checkmarks'
+                label: 'Benefícios'
+                label_singular: 'Benefício'
+                widget: 'list'
+                required: false
+                summary: '{{fields.item}}'
+                field: {name: "item", label: "item", widget: "string", required: false, default: "Acesso Vitalício"}
+            default:
+              - { price: 10, priceFrom: 97, title: "Acesso Comum", link: "https://acopa.com.br/lp/?utm_source=modelo-funil", cta: "Clique aqui para liberar o seu acesso", checkmarks: ["Benefício 1", "Benefício 2"] }
+              - { price: 49, title: "Acesso Premium", link: "https://acopa.com.br/lp/?utm_source=modelo-funil", cta: "Clique aqui para liberar o seu acesso", checkmarks: ["Benefício 1", "Benefício 2"] }
+      - name: afterHeadline
+        label: Reforço de Preço
+        widget: object
+        fields:
+         - { name: 'title', label: 'Chamada da Seção', widget: 'text', required: false, default: "Domine agora mesmo a técnica simples e poderosa que tem acelerado os resultados de centenas de infoprodutores brasileiros."}
+         - { name: 'priceCallout', label: 'Reforço do Preço e Desconto', widget: 'string', required: false, hint: 'Padrão: "90% OFF | De R$ {{preço De}} por *Apenas R$ {{preço}}*"'}
+      - name: testimonials
+        label: Depoimentos
+        widget: object
+        hint: "Pergunte aos seus alunos: eu consegui te ajudar em alguma coisa? Se sim, no que? Como você estava antes, e como está agora?"
+        required: false
+        fields:
+          - { name: 'show', label: 'Exibe Seção de Depoimentos?', widget: 'boolean', default: true }
+          - { name: 'title', label: 'Título da Seção de Depoimentos', widget: 'string', required: false, default: "Quem implementou já está tendo resultado:" }
+          - name: "list"
+            label: "Depoimentos"
+            label_singular: "Depoimento"
+            widget: "list"
+            required: false
+            summary: '{{fields.quote}} - {{fields.author.name}}'
+            default:
+              - quote: Excelente! O curso X foi um divisor de águas. Em <strong>apenas T
+                  meses</strong>, eu fui de A para B
+                author:
+                  name: Maria S.
+                  title: Rio de Janeiro, RJ
+              - quote: Excelente! O <strong>curso X foi um divisor de águas</strong>. Em apenas
+                  T meses, eu fui de A para B
+                author:
+                  name: João
+                  title: Rio de Janeiro, RJ
+              - quote: Excelente! O curso X foi um divisor de águas. Em <strong>apenas T
+                  meses</strong>, eu fui de A para B
+                author:
+                  name: David M.
+                  title: Rio de Janeiro, RJ
+            fields:
+              - {name: quote, label: Depoimento, widget: text, default: "Excelente! O curso X foi um divisor de águas. Em <strong>apenas T meses</strong>, eu fui de A para B"}
+              - name: author
+                label: Autor
+                widget: object
+                required: false
+                fields:
+                  - {label: Nome, name: name, widget: string, default: "David M."}
+                  - {label: Complemento ao nome, name: title, widget: string, required: false, default: "Rio de Janeiro, RJ", hint: "Cidade, Cargo, Conquista após o método... algo nessa linha"}
+                  - {label: Imagem, name: img, widget: image, required: false}
+          - name: "imgList"
+            label: "PRINTS de Depoimentos"
+            label_singular: "Depoimento (imagem)"
+            widget: "list"
+            required: false
+            summary: '{{fields.img}}'
+            hint: "OPCIONAL. Campo para, por exemplo, colocar prints de provas sociais, como conversas de whatsapp, faturamento, etc."
+            field: {name: img, label: Imagem, widget: image, required: false}
+      - name: "what"
+        label: "O que você vai aprender?"
+        widget: object
+        fields:
+          - { name: "title", label: "Título da Seção", widget: "string", required: false, default: "O que você vai aprender no curso?" }
+          - { name: 'body', label: 'Texto Longo', widget: 'markdown', required: false, default: "Você vai aprender a X... <u>Não é necessário saber Y</u>" }
+      - name: "outcomes"
+        label: "Ao concluir o curso você vai saber:"
+        widget: object
+        fields:
+          - { name: "title", label: "Título da Seção", widget: "string", required: false, default: "Ao concluir o curso você vai saber:" }
+          - name: 'list'
+            label: 'Aprendizados'
+            widget: 'list'
+            summary: '{{fields.item}}'
+            required: false
+            field: {name: "item", label: "item", widget: "text", required: false}
+            default:
+              - Criar rapidamente X para fazer Y
+              - Fazer Z seguindo a estratégia que tem gerado resultado R para meus alunos
+              - Criar Y em poucos minutos que conseguem resultado R
+      - name: "who"
+        label: "Para quem?"
+        widget: object
+        fields:
+          - { name: "title", label: "Título da Seção", widget: "string", required: false, default: "O método [X] é perfeito para…" }
+          - name: 'list'
+            label: 'Públicos'
+            label_singular: 'Público'
+            widget: 'list'
+            required: false
+            summary: '{{fields.item}}'
+            field: {name: "item", label: "item", widget: "text", required: false}
+            default: 
+              - Para quem quer ter resultados expressivos sem precisar aparecer.
+              - Para iniciantes em A que estão cansados de X
+              - Para pessoas P que querem ter mais tempo livre e um estilo de vida mais
+                leve
+              - Para quem está cansado desse papo de X  e a chatisse de Y para tentar
+                fazer Z.
+      - name: "benefits"
+        label: "Benefícios Principais"
+        widget: object
+        hint: Ideal ter 3 benefícios 
+        fields:
+          - { name: "title", label: "Título da Seção", widget: "string", required: false, default: "3 Grandes Benefícios do Método X" }
+          - name: 'list'
+            label: 'Benefícios'
+            widget: 'list'
+            required: false
+            summary: '{{fields.title}} - {{fields.text}}'
+            fields:
+              - {name: "title", label: "title", widget: "string", required: false}
+              - {name: "text", label: "text", widget: "text", required: false}
+            default:
+              - title: Você pode fazer X rapidamente
+                text: Criar X é rápido, simples e fácil… Você pode fazer Y
+              - title: X é fácil de vender
+                text: Vender X é muito fácil. Ao saber exatamente como lucrar com eles, você vai
+                  se surpreender com os [resultados] que podem ser gerados todos os
+                  dias/meses.
+              - title: Método validado por milhares de alunos em todos os cantos do mundo
+                text: O método que você vai conhecer hoje já é responsável por transformar a
+                  vida de milhares de alunos.
+      - name: 'countdown'
+        label: 'Contagem Regressiva'
+        widget: 'object'
+        fields:
+          - { name: 'show', widget: 'boolean', label: 'Exibe Contagem regressiva?', default: true }
+          - { name: 'title', widget: 'string', label: 'Título acima da contagem', default: "Esta oferta pode encerrar em:"}
+          - { name: 'time', widget: 'datetime', label: 'Data e Hora da Contagem Regressiva', date_format: "DD/MM/YYYY", time_format: HH:mm, format: "LLL", default: false, required: false, hint: "Padrão: 23:59:59 do mesmo dia em que a página está sendo visitada."}
+          - { name: 'text', widget: 'string', label: 'Texto logo abaixo da contagem', required: false}
+      # - { name: 'img', widget: 'image', label: 'Imagem', required: false }
+      # - { name: 'imgAlt', widget: 'string', label: 'Texto Alternativo da Imagem', required: false }
+      - name: 'tema'
+        label: Tema
+        widget: 'select'
+        required: false
+        options:
+          - { label: 'Dourado', value: "bumblebee" }
+          - { label: 'Dark', value: "dark" }
+          - { label: 'Esmeralda', value: "emerald" }
+          - { label: 'Azul', value: "corporate" }
+          - "light"
+          - "cupcake"
+          - "synthwave"
+          - "retro"
+          - "cyberpunk"
+          - "valentine"
+          - "halloween"
+          - "garden"
+          - "forest"
+          - "aqua"
+          - "lofi"
+          - "pastel"
+          - "fantasy"
+          - "wireframe"
+          - "black"
+          - "luxury"
+          - "dracula"
+          - "cmyk"
+          - "autumn"
+          - "business"
+          - "acid"
+          - "lemonade"
+          - "night"
+          - "coffee"
+          - "winter"
+      - { name: 'noindex', label: 'Proibir Indexação?', widget: 'boolean', required: false, default: false, hint: 'Ative se quiser PROIBIR o Google e outros buscadores de mostrarem esta página nos resultados de pesquisa.' }
+      - { name: 'draft',label: 'Rascunho?',  widget: 'boolean', required: false, default: false, hint: 'Ative este botão para *Modo Rascunho:* Esta página sai do ar, mas a informação continua aqui para você poder editar.' }
+      - { name: 'layout', widget: 'hidden', default: '@layouts/lp.astro'}
+  - name: "paginasesp"
+    label: "Páginas Especiais"
+    files:
+      - name: "home"
+        label: "Página Inicial"
+        file: "src/pages/index.md"
+        fields:
+          - { name: 'showLogo', label: 'Mostra a Logo?', widget: 'boolean', default: false, required: false, hint: "Não se preocupe com sua Logo agora. Deixe para colocar isso por último, se quiser. É totalmente opcional. Assim sendo, se você ativar este campo, você esconde a Logo da Página Inicial." }
+          - { name: 'showTitle', label: 'Mostra o nome da sua marca?', widget: 'boolean', default: true, required: false }
+          - { name: 'showDesc', label: 'Mostra a Descrição da Empresa?', widget: 'boolean', default: true, required: false }
+          - { name: 'body', widget: 'markdown', label: 'Texto Após Títulos', required: false}
+          - { name: 'layout', widget: 'hidden', default: '@layouts/home.astro'}
+          # - label: "Links da Sidebar"
+          #   label_singular: "Link"
+          #   name: "links"
+          #   widget: "list"
+          #   summary: '{{fields.name}} - {{fields.link}}'
+          #   fields:
+          #     - {label: Nome da Página, name: name, widget: string, hint: "Nome do link. Ex.: Contato"}
+          #     - {label: Caminho, name: link, widget: string, hint: "Caminho relativo da página. Ex.: /contato"}
+      - name: "config"
+        label: "Informações Gerais do Site"
+        file: "src/siteInfo.md"
+        fields:
+          - { name: 'companyName', widget: 'string', label: 'Nome da sua Marca' }
+          - { name: 'companyDesc', widget: 'string', label: 'Metadescrição do seu Site', hint: "Curta. Abaixo de 160 caracteres." }
+          - { name: 'lang', widget: 'string', label: 'Idioma Principal', default: 'pt-BR', hint: "Padrão: pt-BR" }
+          - name: 'tema'
+            label: Tema Geral do Site
+            widget: 'select'
+            required: false
+            options:
+              - { label: 'Dourado', value: "bumblebee" }
+              - { label: 'Dark', value: "dark" }
+              - { label: 'Esmeralda', value: "emerald" }
+              - { label: 'Azul', value: "corporate" }
+              - "light"
+              - "cupcake"
+              - "synthwave"
+              - "retro"
+              - "cyberpunk"
+              - "valentine"
+              - "halloween"
+              - "garden"
+              - "forest"
+              - "aqua"
+              - "lofi"
+              - "pastel"
+              - "fantasy"
+              - "wireframe"
+              - "black"
+              - "luxury"
+              - "dracula"
+              - "cmyk"
+              - "autumn"
+              - "business"
+              - "acid"
+              - "lemonade"
+              - "night"
+              - "coffee"
+              - "winter"
+          - name: address
+            label: Localização
+            widget: object
+            required: false
+            fields:
+            - { name: 'city', label: 'Cidade', widget: 'string', required: false}
+            - { name: 'region', label: 'Estado', widget: 'string', required: false}
+            - { name: 'country', label: 'Estado', widget: 'string', required: false, default: 'BR'}
+          - name: social
+            label: Links para as Redes Sociais
+            widget: object
+            required: false
+            fields:
+            - { name: 'instagram', label: 'Instagram', widget: 'string', required: false}
+            - { name: 'facebook', label: 'Facebook', widget: 'string', required: false}
+            - { name: 'linkedin', label: 'Linkedin', widget: 'string', required: false}
+            - { name: 'github', label: 'Github', widget: 'string', required: false}
+          - name: corp
+            label: Informações Corporativas
+            widget: object
+            required: false
+            hint: Não se preocupe com isso. Não tem o menor problema não exisitir.
+            fields:
+            - { name: 'cnpj', label: 'CNPJ', widget: 'string', required: false, hint: '00.000.000/0001-00'}
+            - { name: 'razao', label: 'Razão Social', widget: 'string', required: false, hint: 'Razão Social Ltda.'}
+          - { name: 'hideFooterLogo', label: 'Esconde a Logo nos Rodapés?', widget: 'boolean', default: false, required: false, hint: "Não se preocupe com sua Logo agora. Deixe para colocar isso por último, se quiser. É totalmente opcional. Assim sendo, se você marcar este campo, você esconde a Logo nos rodapés." }
+          - { name: 'themeChanger', label: 'Exibe botão de Experimentação de Tema nos Rodapés?', widget: 'boolean', default: true, required: false}
+          - { name: 'body', widget: 'markdown', modes: ["raw"], buttons: ["bold"], required: false, label: 'Código SVG da sua Logo', hint: "Não se preocupe com isso agora, é totalmente dispensável para começar."}
